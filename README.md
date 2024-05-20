@@ -1,4 +1,4 @@
-### Superset custom build
+### Apache Superset custom build
 
 ### Changes made
 
