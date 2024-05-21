@@ -59,7 +59,6 @@ export const CALENDAR_RANGE_OPTIONS: SelectOptionType[] = [
     label: t('current month'),
   },
   { value: PreviousCalendarYear, label: t('current year') },
-  
 ];
 
 // export const CURRENT_CALENDAR_RANGE_OPTIONS: SelectOptionType[] = [
@@ -70,7 +69,6 @@ export const CALENDAR_RANGE_OPTIONS: SelectOptionType[] = [
 //     label: t('This month'),
 //   },
 //   { value: CurrentYear, label: t('This year') },
-  
 // ];
 
 export const CALENDAR_RANGE_VALUES_SET = new Set(

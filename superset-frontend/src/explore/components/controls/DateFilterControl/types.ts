@@ -87,7 +87,6 @@ export type CalendarRangeType =
   | typeof PreviousCalendarMonth
   | typeof PreviousCalendarYear;
 
-
 export const CurrentWeek = 'current week';
 export const CurrentMonth = 'current month';
 export const CurrentYear = 'current year';

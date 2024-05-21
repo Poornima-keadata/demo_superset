@@ -52,7 +52,6 @@ import {
   CustomFrame,
   AdvancedFrame,
   DateLabel,
-  CurrentCalenderFrame
 } from './components';
 
 const StyledRangeType = styled(Select)`

@@ -390,8 +390,8 @@ const RightMenu = ({
             /^#(?:[0-9a-f]{3}){1,2}$/i.test(environmentTag.color)
               ? environmentTag.color
               : environmentTag.color
-                  .split('.')
-                  .reduce((o, i) => o[i], theme.colors)
+                .split('.')
+                .reduce((o, i) => o[i], theme.colors)
           }
         >
           <span css={tagStyles}>{environmentTag.text}</span>
@@ -522,7 +522,7 @@ const RightMenu = ({
               <div className="about-section">
                 {navbarRight.show_watermark && (
                   <div css={versionInfoStyles}>
-                    {t('')}
+                    {t('...')}
                   </div>
                 )}
                 {navbarRight.version_string && (
@@ -623,7 +623,7 @@ class RightMenuErrorWrapper extends React.PureComponent<RightMenuProps> {
     return { hasError: true };
   }
 
-  noop = () => {};
+  noop = () => { };
 
   render() {
     if (this.state.hasError) {
