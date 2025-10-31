@@ -22,6 +22,13 @@
 #
 import logging
 import os
+import re
+import sys
+from collections import OrderedDict
+from datetime import timedelta
+from email.mime.multipart import MIMEMultipart
+from typing import Any, Callable, Literal, TYPE_CHECKING, TypedDict
+
 
 from celery.schedules import crontab
 from flask_caching.backends.filesystemcache import FileSystemCache
@@ -72,12 +79,33 @@ CACHE_CONFIG = {
 DATA_CACHE_CONFIG = CACHE_CONFIG
 
 
+GLOBAL_ASYNC_QUERIES_REDIS_CONFIG = {
+    "port": 6379,
+    "host": REDIS_HOST,
+    "password": "",
+    "db": 0,
+    "ssl": False,
+}
+GLOBAL_ASYNC_QUERIES_REDIS_STREAM_PREFIX = "async-events-"
+GLOBAL_ASYNC_QUERIES_REDIS_STREAM_LIMIT = 1000
+GLOBAL_ASYNC_QUERIES_REDIS_STREAM_LIMIT_FIREHOSE = 1000000
+GLOBAL_ASYNC_QUERIES_JWT_COOKIE_NAME = "async-token"
+GLOBAL_ASYNC_QUERIES_JWT_COOKIE_SECURE = False
+GLOBAL_ASYNC_QUERIES_JWT_COOKIE_SAMESITE: None
+GLOBAL_ASYNC_QUERIES_JWT_COOKIE_DOMAIN = None
+GLOBAL_ASYNC_QUERIES_JWT_SECRET = "bPNUGxELYWF3UzQck+mix3gmDTeicznzZtrEibBvmeQxR4V6+GWLs3As+sSVOhru3eBe9jl2D4XSg55iBf6Vurhyho4de3wQq+cnQId5WI8="
+GLOBAL_ASYNC_QUERIES_TRANSPORT = "polling"
+GLOBAL_ASYNC_QUERIES_POLLING_DELAY = int(
+    timedelta(milliseconds=500).total_seconds() * 1000
+)
+
+
 class CeleryConfig:
     broker_url = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_CELERY_DB}"
-    imports = ("superset.sql_lab",)
+    imports = ("superset.sql_lab","superset.tasks",)
     result_backend = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_RESULTS_DB}"
-    worker_prefetch_multiplier = 1
-    task_acks_late = False
+    worker_prefetch_multiplier = 3
+    task_acks_late = True
     beat_schedule = {
         "reports.scheduler": {
             "task": "reports.scheduler",
@@ -92,15 +120,27 @@ class CeleryConfig:
 
 CELERY_CONFIG = CeleryConfig
 
-FEATURE_FLAGS = {"ALERT_REPORTS": True}
-ALERT_REPORTS_NOTIFICATION_DRY_RUN = True
-WEBDRIVER_BASEURL = "http://superset:8088/"  # When using docker compose baseurl should be http://superset_app:8088/
+FEATURE_FLAGS = {
+    "ALERT_REPORTS": True,
+    "ENABLE_TEMPLATE_PROCESSING" : True,
+    "DASHBOARD_CROSS_FILTERS" : True,
+    "HORIZONTAL_FILTER_BAR": True,
+    "DASHBOARD_FILTERS_EXPERIMENTAL": True,
+    "DASHBOARD_NATIVE_FILTERS_SET": True,
+    "DASHBOARD_NATIVE_FILTERS": True,
+    "LISTVIEWS_DEFAULT_CARD_VIEW": True,
+    "GLOBAL_ASYNC_QUERIES":True,
+    "DASHBOARD_RBAC": True,
+    }
+ALERT_REPORTS_NOTIFICATION_DRY_RUN = False
+WEBDRIVER_BASEURL = "http://superset:8088/"
 # The base URL for the email report hyperlinks.
 WEBDRIVER_BASEURL_USER_FRIENDLY = WEBDRIVER_BASEURL
 
 SQLLAB_CTAS_NO_LIMIT = True
 
 #
+
 # Optionally import superset_config_docker.py (which will have been included on
 # the PYTHONPATH) in order to allow for local settings to be overridden
 #
@@ -113,3 +153,39 @@ try:
     )
 except ImportError:
     logger.info("Using default Docker config...")
+
+TALISMAN_ENABLED = False
+
+APP_NAME = "Pullix BI Dashboard"
+
+LOGO_TARGET_PATH = '/dashboard/list/'
+
+# Uncomment to setup an App icon
+APP_ICON = "https://ergodotisi.blob.core.windows.net/generalimages/companies/33227.jpg"
+APP_ICON_WIDTH = 150
+
+FAVICONS = [{"href": "https://lh3.googleusercontent.com/-F-FzCn3BpNU/AAAAAAAAAAI/AAAAAAAAAAA/pRUX-cvC5P8/s88-w44-h44-p-k-no-ns-nd/photo.jpg"}]
+
+SCREENSHOT_LOCATE_WAIT = 100
+SCREENSHOT_LOAD_WAIT = 600
+
+# Slack configuration
+SLACK_API_TOKEN = "xoxb-token"
+
+# Email configuration
+SMTP_HOST = "smtp.strato.de" # change to your host
+SMTP_PORT = 587 # your port, e.g. 587
+SMTP_STARTTLS = True
+SMTP_SSL_SERVER_AUTH = False # If your using an SMTP server with a valid certificate
+SMTP_SSL = False
+SMTP_USER = "no-reply@kea-data.com" # use the empty string "" if using an unauthenticated SMTP server
+SMTP_PASSWORD = "KeaN0R9cv$p123" # use the empty string "" if using an unauthenticated SMTP server
+SMTP_MAIL_FROM = "no-reply@kea-data.com"
+EMAIL_REPORTS_SUBJECT_PREFIX = "[RMS CRM Alert] " # optional - overwrites default value in config.py of "[Report]
+EMAIL_REPORTS_CTA = "Explore in Dashboard"
+
+
+SUPERSET_WEBSERVER_TIMEOUT = int(timedelta(minutes=5).total_seconds())
+BASE_URL = '/'
+SUPERSET_WEBSERVER_ROUTE_BASE = '/'
+LOGIN_REDIRECT_URL = '/'
