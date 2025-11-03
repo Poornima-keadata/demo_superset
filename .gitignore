@@ -113,3 +113,4 @@ docker/requirements-local.txt
 
 cache/
 docker/*local*
+"superset/db_engine_specs/README.md" 
