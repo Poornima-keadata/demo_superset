@@ -64,6 +64,9 @@ services:
     ports:
       - 8088:8088
     depends_on: *superset-depends-on
+    environment:
+      - EXTERNAL_DB_URI=${EXTERNAL_DB_URI}
+
     volumes: *superset-volumes
 
   superset-init:
