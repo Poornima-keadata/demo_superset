@@ -51,16 +51,33 @@ services:
     restart: unless-stopped
     volumes:
       - db_home:/var/lib/postgresql/data
-      - ./docker/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
-    networks:
-      - superset_net
+      - ./docker/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.dv
 
+version: "3.9"
+services:
+  postgres:
+    image: postgres:16
+    container_name: new
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdata  # safer subfolder for data
+    ports:
+      - "5444:5432"  # host:container
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
   superset:
     env_file: docker/.env # default
     build:
       <<: *common-build
     container_name: superset_app
-    command: ["/app/docker/docker-bootstrap.sh", "app-gunicorn"]
+    command: ["/app/docker/dockera-bootstrap.sh", "app-gunicorn"]
     user: "root"
     restart: unless-stopped
     ports:
@@ -70,8 +87,8 @@ services:
     #   - EXTERNAL_DB_URI=${EXTERNAL_DB_URI}
 
     volumes: *superset-volumes
-    networks:
-      - superset_net
+    # networks:
+    #   - superset_net
 
   superset-init:
     container_name: superset_init
@@ -82,8 +99,8 @@ services:
     depends_on: *superset-depends-on
     user: "root"
     volumes: *superset-volumes
-    networks:
-      - superset_net
+    # networks:
+    #   - superset_net
     healthcheck:
       disable: true
 
@@ -98,8 +115,8 @@ services:
     depends_on: *superset-depends-on
     user: "root"
     volumes: *superset-volumes
-    networks:
-      - superset_net
+    # networks:
+    #   - superset_net
     healthcheck:
       test:
         [
@@ -117,8 +134,8 @@ services:
     depends_on: *superset-depends-on
     user: "root"
     volumes: *superset-volumes
-    networks:
-      - superset_net
+    # networks:
+    #   - superset_net
     healthcheck:
       disable: true
 
@@ -129,7 +146,7 @@ volumes:
     external: false
   redis:
     external: false
-networks:
-  superset_net:
-    external: true
-    name: postgres_setup_superset_net
+# networks:
+#   superset_net:
+#     external: true
+#     name: postgres_setup_superset_net
