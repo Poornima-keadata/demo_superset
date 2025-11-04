@@ -54,22 +54,22 @@ services:
       - ./docker/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.dv
 
 
-  External_postgres:
-    image: postgres:16
-    container_name: superset_postgres
-    restart: always
-    environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      PGDATA: /var/lib/postgresql/data/pgdata  # safer subfolder for data
-    ports:
-      - "5444:5432"  # host:container
-    volumes:
-      - ./data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+  # External_postgres:
+  #   image: postgres:16
+  #   container_name: superset_postgres
+  #   restart: always
+  #   environment:
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  #     PGDATA: /var/lib/postgresql/data/pgdata  # safer subfolder for data
+  #   ports:
+  #     - "5444:5432"  # host:container
+  #   volumes:
+  #     - ./data:/var/lib/postgresql/data
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U postgres"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
   
   superset:
     env_file: docker/.env # default
