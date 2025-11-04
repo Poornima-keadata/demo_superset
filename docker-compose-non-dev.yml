@@ -53,11 +53,10 @@ services:
       - db_home:/var/lib/postgresql/data
       - ./docker/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.dv
 
-version: "3.9"
-services:
-  postgres:
+
+  External_postgres:
     image: postgres:16
-    container_name: new
+    container_name: superset_postgres
     restart: always
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
