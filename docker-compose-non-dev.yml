@@ -68,6 +68,8 @@ services:
     #   - EXTERNAL_DB_URI=${EXTERNAL_DB_URI}
 
     volumes: *superset-volumes
+    networks:
+      - superset_net
 
   superset-init:
     container_name: superset_init
@@ -78,8 +80,11 @@ services:
     depends_on: *superset-depends-on
     user: "root"
     volumes: *superset-volumes
+    networks:
+      - superset_net
     healthcheck:
       disable: true
+
 
   superset-worker:
     build:
@@ -91,6 +96,8 @@ services:
     depends_on: *superset-depends-on
     user: "root"
     volumes: *superset-volumes
+    networks:
+      - superset_net
     healthcheck:
       test:
         [
@@ -108,6 +115,8 @@ services:
     depends_on: *superset-depends-on
     user: "root"
     volumes: *superset-volumes
+    networks:
+      - superset_net
     healthcheck:
       disable: true
 
@@ -118,3 +127,7 @@ volumes:
     external: false
   redis:
     external: false
+networks:
+  superset_net:
+    external: true
+    name: postgres_setup_superset_net
